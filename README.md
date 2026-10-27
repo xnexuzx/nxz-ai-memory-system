@@ -6,7 +6,7 @@
   <h1>🧠 NXZ AI Memory System Skill</h1>
   <p>
     <b>A robust, agentic memory system skill for AI coding assistants.</b><br>
-    This skill guides the AI to autonomously initialize or migrate a standardized 4-file memory architecture in your projects, ensuring the AI maintains context, tracks bugs, and adheres to your design decisions across multiple coding sessions.
+    This skill guides the AI to autonomously initialize or migrate a standardized 5-file memory architecture in your projects, ensuring the AI maintains context, tracks bugs, captures decisions with lifecycle, and adheres to your design decisions across multiple coding sessions.
   </p>
   <br>
   
@@ -25,16 +25,62 @@ The **NXZ AI Memory System** is built to be as simple and frictionless as possib
 - **Universally Compatible:** Because it relies entirely on standard Markdown files and directives based on the `AGENTS.md` standard, it is completely agnostic. It can be applied to any type of project, framework, or language.
 - **Model Agnostic:** The architecture is intentionally lightweight, making it perfectly usable not only for frontier-level AI models, but also highly effective for smaller, local models running on your own hardware.
 
-## 🧠 The 4-File Architecture
+## 🆕 What's New in v2.0.0 🎉
+
+### 📁 New File: `decisions.md` — Structured Decision Capture
+
+A dedicated file for decisions, technical discards, discoveries, and conventions with full lifecycle tracking:
+
+- **Permanent IDs** (`D-01`, `D-02`...) with states: `[ACTIVE]`, `[REPLACED->D-NN]`, `[OBSOLETE]`
+- **Topic keys** for upsert/deduplication and conflict surfacing
+- **Admission test** (relevance + unrecoverability) prevents noise
+- **One-line short form** for quick captures
+- Auto-updated `Last decision` header and `Reviewed` timestamp on version close
+
+### 🏗️ `AGENTS.md` — 6 New Protocol Sections
+
+| Section | Purpose |
+| --------- | --------- |
+| `## Memory Routing` | Route info by "what does a future agent need this for?" |
+| `## Decision Capture` | Write decisions in same turn; admission test + conflict surfacing |
+| `## Retrieval Order` | `active_context.md` → decisions → changelog (on trigger phrases: "what did we do", "how did we solve", "remember", "continue as before", "as we agreed", "as discussed", "per our decision", or any reference to prior decisions) |
+| `## Active Context Hygiene` | Archival signals, 125-line limit, remnant rule |
+| `## Task Close Checklist` | Silent self-check after each task |
+
+### 🔄 Redesigned `active_context.md` — Handoff Note (Not History)
+
+- **Hard 125-line limit** with proactive ~100-line archival threshold
+- **6 structured sections**: `Current Objective` (anchor), `Current State`, `Current Phase Changes` (max 10), `Active Bugs & Technical Debt`, `Next Steps`, `Key Files in Play` (soft limit 12)
+- **AI-proposed archival** with human approval (replaces human-only archival)
+- **Mandatory Remnant Rule** never left empty after archival
+
+### 📋 Enhanced `changelog.md` — Chronological History
+
+- **Unversioned block** `## [Unversioned] — in progress` for partial archives (AI never invents versions)
+- **Chronological session separation** dates preserved across sessions
+- **Append-only content, newest blocks at top** immutable history
+- **Changelog principle**: "summarize phases, do not log tool calls"
+
+### 🛡️ Resilience & Operational Improvements
+
+- **Tool fallbacks** (`grep`→native search, `list_dir`→shell, `write_to_file`→native write)
+- **Idempotency guide** for maintenance runs (fix format, verify integrity, add info)
+- **Structural tokens fixed in English** (headings, fields, states) prose in user's native language
+- **Migration v1→v2** with flexible heading search + user confirmation (zero data loss)
+- **Session close protocol** contextual detection (plan complete, task done) → propose full close with handoff
+- **Auto-update protocol** version compare, confirm before apply, never downgrade without approval+backup
+
+## 🧠 The 5-File Architecture
 
 When triggered, the AI will create/update the following files:
 
 | File | Role | Location |
 | --- | --- | --- |
-| `AGENTS.md` | **The Constitution:** Core rules and the Memory Maintenance Protocol. | Root |
-| `project_knowledge.md` | **Foundational Encyclopedia:** Architecture, stack, and historical design decisions. | `.ai/` |
-| `active_context.md` | **Live State:** Current bugs, recent changes, and next steps. | `.ai/` |
-| `changelog.md` | **Chronological History:** Append-only log of past versions and sessions. | `.ai/` |
+| `AGENTS.md` | **The Constitution:** Core rules, Memory Routing, Decision Capture, Retrieval Order, Context Hygiene, Reset Recovery, Task Close Checklist. | Root |
+| `project_knowledge.md` | **Foundational Encyclopedia:** Architecture, stack, directory tree (`## Project Structure`), data flow. Historical decisions moved to `decisions.md`. | `.ai/` |
+| `active_context.md` | **Live State (Handoff Note):** `## Current Objective` anchor, phase state, max 10 changes, active bugs only, next steps, key files. Hard limit 125 lines. | `.ai/` |
+| `decisions.md` | **Structured Decisions:** Decisions, discards, discoveries, conventions with lifecycle (`[ACTIVE]`/`[REPLACED]`/`[OBSOLETE]`), conflict surfacing, topic keys. | `.ai/` |
+| `changelog.md` | **Chronological History:** Append-only with version headings + unversioned block `## [Unversioned] — in progress` for partial archives. | `.ai/` |
 
 ## 🚀 Installation & Compatibility
 
@@ -54,24 +100,24 @@ Depending on whether you downloaded the full repository or just the file, choose
 - **Method 1 (Repository Folder):** Copy the entire `nxz-ai-memory-system` folder into the target global skills directory.
 - **Method 2 (Single File):** Create a folder named `nxz-ai-memory-system` inside the target global skills directory and place `SKILL.md` inside it.
 
-#### Target Global Directories by Platform:
+#### Target Global Directories by Platform
 
-**1. Cursor**
+#### 1. Cursor
 
 - Global Directory: `~/.cursor/skills/`
 - Final Path: `~/.cursor/skills/nxz-ai-memory-system/SKILL.md`
 
-**2. Antigravity IDE**
+#### 2. Antigravity IDE
 
 - Global Directory: `~/.gemini/config/skills/`
 - Final Path: `~/.gemini/config/skills/nxz-ai-memory-system/SKILL.md`
 
-**3. Claude Code (CLI)**
+#### 3. Claude Code (CLI)
 
 - Global Directory: `~/.claude/skills/`
 - Final Path: `~/.claude/skills/nxz-ai-memory-system/SKILL.md`
 
-**4. Codex (OpenAI CLI)**
+#### 4. Codex (OpenAI CLI)
 
 - Global Directory: `~/.codex/skills/`
 - Final Path: `~/.codex/skills/nxz-ai-memory-system/SKILL.md`
@@ -88,11 +134,15 @@ Depending on whether you downloaded the full repository or just the file, choose
 
 ## ⚙️ Features
 
-- **Collision Detection:** Safely detects if you already have memory files (like `memory-bank/`) and helps you migrate.
-- **Strict Protocols:** Forces the AI to read the memory before acting, preventing hallucinations.
-- **Chronological Separation:** Enforces real chronological logging in your changelogs without merging dates.
+- **Collision Detection & Migration:** Safely detects if you already have memory files (like `memory-bank/`) and helps you migrate, including v1→v2 zero-loss migration.
+- **Strict Protocols:** Forces the AI to read the memory before acting, preventing hallucinations. Includes Memory Routing, Decision Capture, Retrieval Order, Context Hygiene, Reset Recovery, and Task Close Checklist.
+- **Structured Decision Capture:** Decisions, technical discards, discoveries, and conventions with lifecycle states (`[ACTIVE]`, `[REPLACED]`, `[OBSOLETE]`), topic keys for upserts, and conflict surfacing. **Auto-loaded on trigger phrases** ("remember", "continue as before", "as we agreed", "as discussed", "per our decision", or any reference to prior decisions/conversations) so the AI recalls past choices without reminders.
+- **Active Context as Handoff Note:** `## Current Objective` anchor with hard 125-line limit, archival triggered by AI proposal + human approval (not human-only), unversioned changelog block for partial archives.
+- **Verified Directory Tree:** `## Project Structure` built from real `list_dir` output with strict rules, verified in Phase 4.
+- **Chronological Separation:** Enforces real chronological logging in changelogs without merging dates. Unversioned block prevents AI from inventing versions.
 - **Zero Destructive Deletion:** Mandates system Recycle Bin protection across all agent actions.
-- **Interactive Customization:** Adapts memory autonomy and documentation sync rules directly during setup via interactive questions.
+- **Interactive Customization:** Adapts memory autonomy, documentation sync, and client rules stub (Engram resilience layer 3) during setup via interactive questions.
+- **Context Reset Recovery:** Two-step recovery protocol (persist → re-read → continue) if compaction/summary injection detected.
 
 ## 🗑️ Uninstall
 
