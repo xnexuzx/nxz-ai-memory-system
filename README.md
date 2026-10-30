@@ -25,50 +25,34 @@ The **NXZ AI Memory System** is built to be as simple and frictionless as possib
 - **Universally Compatible:** Because it relies entirely on standard Markdown files and directives based on the `AGENTS.md` standard, it is completely agnostic. It can be applied to any type of project, framework, or language.
 - **Model Agnostic:** The architecture is intentionally lightweight, making it perfectly usable not only for frontier-level AI models, but also highly effective for smaller, local models running on your own hardware.
 
-## 🆕 What's New in v2.0.0 🎉
+## 🆕 What's New in v2.1.0 (since v1.0) 🎉
 
-### 📁 New File: `decisions.md` — Structured Decision Capture
+v2.1.0 is the full upgrade from the original 4-file system (v1.0). It includes everything introduced in v2.0.0, refined so that smaller local models can follow it reliably.
 
-A dedicated file for decisions, technical discards, discoveries, and conventions with full lifecycle tracking:
+### 📊 At a Glance
 
-- **Permanent IDs** (`D-01`, `D-02`...) with states: `[ACTIVE]`, `[REPLACED->D-NN]`, `[OBSOLETE]`
-- **Topic keys** for upsert/deduplication and conflict surfacing
-- **Admission test** (relevance + unrecoverability) prevents noise
-- **One-line short form** for quick captures
-- Auto-updated `Last decision` header and `Reviewed` timestamp on version close
+| Aspect | v1.0 | v2.1.0 |
+| --- | --- | --- |
+| **Memory files** | 4 | **5** (`decisions.md` added) |
+| **How files are generated** | Written by the AI from a prose description | **Copied from literal templates** with `{{MARKERS}}` |
+| **Decisions** | Historical appendix inside `project_knowledge.md` | **Dedicated file** with permanent IDs, lifecycle states, and deduplication |
+| **Active Context** | ~15 loose items, archived by the human | **6 sections with per-section limits**, archival proposed by the AI and approved by the human |
+| **Changelog** | Simple append-only | **Unversioned block**, session dates preserved, explicit version close |
+| **Grill Me (Phase 2)** | ~5 questions | **11 categories**, each tagged `[assume default]` or `[no default]` |
+| **Versioning** | Human-assigned | Human-assigned, **stored in one place**, never proposed by the AI |
+| **Permanent deletion** | Always forbidden | **Your choice** during setup |
+| **Migration** | None | **v1→v2 zero-loss migration** |
+| **Language** | Mixed | **Structural tokens fixed in English**, content in your language |
 
-### 🏗️ `AGENTS.md` — 6 New Protocol Sections
+### ✨ Highlights
 
-| Section | Purpose |
-| --------- | --------- |
-| `## Memory Routing` | Route info by "what does a future agent need this for?" |
-| `## Decision Capture` | Write decisions in same turn; admission test + conflict surfacing |
-| `## Retrieval Order` | `active_context.md` → decisions → changelog (on trigger phrases: "what did we do", "how did we solve", "remember", "continue as before", "as we agreed", "as discussed", "per our decision", or any reference to prior decisions) |
-| `## Active Context Hygiene` | Archival signals, 125-line limit, remnant rule |
-| `## Task Close Checklist` | Silent self-check after each task |
-
-### 🔄 Redesigned `active_context.md` — Handoff Note (Not History)
-
-- **Hard 125-line limit** with proactive ~100-line archival threshold
-- **6 structured sections**: `Current Objective` (anchor), `Current State`, `Current Phase Changes` (max 10), `Active Bugs & Technical Debt`, `Next Steps`, `Key Files in Play` (soft limit 12)
-- **AI-proposed archival** with human approval (replaces human-only archival)
-- **Mandatory Remnant Rule** never left empty after archival
-
-### 📋 Enhanced `changelog.md` — Chronological History
-
-- **Unversioned block** `## [Unversioned] — in progress` for partial archives (AI never invents versions)
-- **Chronological session separation** dates preserved across sessions
-- **Append-only content, newest blocks at top** immutable history
-- **Changelog principle**: "summarize phases, do not log tool calls"
-
-### 🛡️ Resilience & Operational Improvements
-
-- **Tool fallbacks** (`grep`→native search, `list_dir`→shell, `write_to_file`→native write)
-- **Idempotency guide** for maintenance runs (fix format, verify integrity, add info)
-- **Structural tokens fixed in English** (headings, fields, states) prose in user's native language
-- **Migration v1→v2** with flexible heading search + user confirmation (zero data loss)
-- **Session close protocol** contextual detection (plan complete, task done) → propose full close with handoff
-- **Auto-update protocol** version compare, confirm before apply, never downgrade without approval+backup
+- **📁 New `decisions.md`:** decisions, discards, and preferences get their own file with permanent IDs (`D-01`...) and states (`[ACTIVE]`, `[REPLACED->D-NN]`, `[OBSOLETE]`). The AI checks it before deciding, so settled choices are not reopened.
+- **📐 Literal templates:** the AI copies a template for each file and fills its markers, so every installation looks the same, whatever model you use.
+- **🏗️ One Memory Protocol in `AGENTS.md`:** clear rules for session start, while working, and after each task. Decisions are saved in the same turn, not at session end.
+- **🔄 `active_context.md` as a handoff note:** 6 sections with visible limits. The AI proposes archiving to the changelog when a phase ends; you approve.
+- **📋 Safer versioning:** the AI never invents or proposes version numbers. Closing a version is a single message in the chat.
+- **⚙️ Tailored setup:** 11 Grill Me questions, including memory autonomy, documentation sync, and optional recoverable deletion (Recycle Bin or `_trash/`).
+- **🛡️ Safe migration:** detects existing memory systems, backs up `AGENTS.md`, and migrates v1 projects with zero data loss.
 
 ## 🧠 The 5-File Architecture
 
@@ -76,11 +60,11 @@ When triggered, the AI will create/update the following files:
 
 | File | Role | Location |
 | --- | --- | --- |
-| `AGENTS.md` | **The Constitution:** Core rules, Memory Routing, Decision Capture, Retrieval Order, Context Hygiene, Reset Recovery, Task Close Checklist. | Root |
-| `project_knowledge.md` | **Foundational Encyclopedia:** Architecture, stack, directory tree (`## Project Structure`), data flow. Historical decisions moved to `decisions.md`. | `.ai/` |
-| `active_context.md` | **Live State (Handoff Note):** `## Current Objective` anchor, phase state, max 10 changes, active bugs only, next steps, key files. Hard limit 125 lines. | `.ai/` |
-| `decisions.md` | **Structured Decisions:** Decisions, discards, discoveries, conventions with lifecycle (`[ACTIVE]`/`[REPLACED]`/`[OBSOLETE]`), conflict surfacing, topic keys. | `.ai/` |
-| `changelog.md` | **Chronological History:** Append-only with version headings + unversioned block `## [Unversioned] — in progress` for partial archives. | `.ai/` |
+| `AGENTS.md` | **The Constitution:** Role, Memory Protocol (start, while working, after each task, never, files), Memory File Formats, and project rules. | Root |
+| `project_knowledge.md` | **Foundational Encyclopedia:** Current version, philosophy, stack, directory tree (`## Project Structure`), architecture, data flow. | `.ai/` |
+| `active_context.md` | **Live State (Handoff Note):** 6 sections with per-section limits: objective, state, phase changes, active bugs, next steps, key files. | `.ai/` |
+| `decisions.md` | **Structured Decisions:** Decisions, discards, discoveries, conventions, and preferences with lifecycle (`[ACTIVE]`/`[REPLACED->D-NN]`/`[OBSOLETE]`). | `.ai/` |
+| `changelog.md` | **Chronological History:** Append-only, newest first, with the `## [Unversioned] — in progress` block for partial archives. | `.ai/` |
 
 ## 🚀 Installation & Compatibility
 
@@ -127,22 +111,22 @@ Depending on whether you downloaded the full repository or just the file, choose
 1. Open your project in your AI IDE.
 2. In the chat, prompt the agent:
    > *Initialize the nxz memory system in this project.*
-3. **The Grill Me Phase:** The AI will scan your project and ask you a series of questions (Stack, Goals, Versioning, CI/CD) to ensure the memory is perfectly tailored to your needs.
+3. **The Grill Me Phase:** The AI will scan your project and ask you a series of questions (goals, stack, versioning, CI/CD, memory autonomy, documentation sync, recoverable deletion...) to ensure the memory is perfectly tailored to your needs.
 4. **Review & Approve:** Once the AI generates the files, review them. From then on, the AI will autonomously maintain its memory across sessions!
 5. **Checking for Updates:** If you ever want to check for or pull upstream updates to the skill:
    > *Check if there is an update for the nxz-ai-memory-system skill from its repository and update it if available.*
 
 ## ⚙️ Features
 
-- **Collision Detection & Migration:** Safely detects if you already have memory files (like `memory-bank/`) and helps you migrate, including v1→v2 zero-loss migration.
-- **Strict Protocols:** Forces the AI to read the memory before acting, preventing hallucinations. Includes Memory Routing, Decision Capture, Retrieval Order, Context Hygiene, Reset Recovery, and Task Close Checklist.
-- **Structured Decision Capture:** Decisions, technical discards, discoveries, and conventions with lifecycle states (`[ACTIVE]`, `[REPLACED]`, `[OBSOLETE]`), topic keys for upserts, and conflict surfacing. **Auto-loaded on trigger phrases** ("remember", "continue as before", "as we agreed", "as discussed", "per our decision", or any reference to prior decisions/conversations) so the AI recalls past choices without reminders.
-- **Active Context as Handoff Note:** `## Current Objective` anchor with hard 125-line limit, archival triggered by AI proposal + human approval (not human-only), unversioned changelog block for partial archives.
-- **Verified Directory Tree:** `## Project Structure` built from real `list_dir` output with strict rules, verified in Phase 4.
-- **Chronological Separation:** Enforces real chronological logging in changelogs without merging dates. Unversioned block prevents AI from inventing versions.
-- **Zero Destructive Deletion:** Mandates system Recycle Bin protection across all agent actions.
-- **Interactive Customization:** Adapts memory autonomy, documentation sync, and client rules stub (Engram resilience layer 3) during setup via interactive questions.
-- **Context Reset Recovery:** Two-step recovery protocol (persist → re-read → continue) if compaction/summary injection detected.
+- **Collision Detection & Migration:** Safely detects existing memory files (like `memory-bank/`) or IDE rules files and helps you migrate, including a zero-loss v1→v2 migration.
+- **Deterministic Output:** Literal templates with markers, resolved Grill Me options, and a Phase 4 checklist.
+- **Observable Triggers:** Decisions are captured in the same turn when the user says "always", "never", "remember", accepts or rejects a proposal, or when an option is chosen, discarded, or discovered.
+- **Retrieval Before Deciding:** Before a design decision, or when the user refers to past work, the AI checks `active_context.md`, then decision headings, then the changelog.
+- **Active Context as Handoff Note:** Per-section limits and AI-proposed archival with human approval. The file is never left empty.
+- **Verified Directory Tree:** `## Project Structure` built from a real directory listing (max 3 levels), kept in sync without approval.
+- **Human-Only Versioning:** The AI never invents, proposes, or increments version numbers.
+- **Optional Recoverable Deletion:** If enabled, permanent deletion commands are forbidden and removals go to the Recycle Bin or `_trash/`. The skill itself never deletes permanently during installation.
+- **Context Reset Recovery:** On compaction or summary, the AI saves state and pending decisions first, then re-reads the memory.
 
 ## 🗑️ Uninstall
 

@@ -5,26 +5,24 @@ description: Invoke this skill when the user requests to implement, initialize, 
 
 # Role: Agentic Memory System Architect
 
-> **Repo (v2.0.0):** <https://github.com/xnexuzx/nxz-ai-memory-system> | **Raw:** `https://raw.githubusercontent.com/xnexuzx/nxz-ai-memory-system/main/SKILL.md`  
+> **Repo (v2.1.0):** <https://github.com/xnexuzx/nxz-ai-memory-system> | **Raw:** `https://raw.githubusercontent.com/xnexuzx/nxz-ai-memory-system/main/SKILL.md`  
 > *Self-update:* If asked to check updates or sync, fetch raw upstream, compare version numbers (local vs remote). If different, report the difference and ask for confirmation before applying. Never downgrade without explicit human approval and backup.
 
-Objective: Initialize or migrate the "nxz ai memory system" in the current project. The system consists of 5 files with complementary roles that enable an agentic AI to work with continuity across sessions:
+Objective: Initialize or migrate the "nxz ai memory system" in the current project: 5 files with complementary roles that let an agentic AI work with continuity across sessions. This skill is a short procedure. The exact content of each file lives in **Appendix B (templates)**: copy it, fill the markers, do not rewrite it.
 
-| File | Role | Location |
-| --- | --- | --- |
-| `AGENTS.md` | Agent constitution (rules, protocol). Modified by the human (or AI under explicit human instruction). | Project root |
-| `project_knowledge.md` | Foundational encyclopedia (architecture, stack, structure). Updated per autonomy level configured during setup. | `.ai/` |
-| `active_context.md` | Live state of the current phase (handoff note). | `.ai/` |
-| `changelog.md` | Chronological history by version (append-only). | `.ai/` |
-| `decisions.md` | Structured decisions, discards, discoveries with lifecycle and conflict surfacing. | `.ai/` |
+| File | Role | Location | Template |
+| --- | --- | --- | --- |
+| `AGENTS.md` | Agent constitution: rules, memory protocol, file formats. | Project root | B.1 |
+| `project_knowledge.md` | Foundational encyclopedia (stack, structure, architecture). | `.ai/` | B.2 |
+| `active_context.md` | Live state of the current phase (handoff note). | `.ai/` | B.3 |
+| `decisions.md` | Decisions, discards, discoveries with lifecycle. | `.ai/` | B.4 |
+| `changelog.md` | Chronological history by version (append-only). | `.ai/` | B.5 |
 
-Follow the phases below strictly and in order. Do not skip any.
-
----
+Follow the phases below in order. Do not skip any.
 
 ## Idempotency Guide
 
-If the project already contains a valid v2 memory system (`.ai/` with 5 files, `decisions.md` has header, `active_context.md` has 6 sections), **do not regenerate**. Instead: run Phase 1 (scan) → Phase 2 (Grill Me only for gaps) → Phase 3 (update only changed sections) → Phase 4 (verify). Never overwrite user content without explicit confirmation. This guide applies for maintenance: fixing broken format, verifying integrity, or adding information after substantial changes.
+If the project already has a valid memory system (`.ai/` with 5 files, `decisions.md` exists, `active_context.md` has 6 sections), **do not regenerate**. Run Phase 1 (scan) → Phase 2 (Grill Me only for gaps) → Phase 3 (update only changed sections) → Phase 4 (verify). Never overwrite user content without explicit confirmation. Also use this path for maintenance: fixing broken format, verifying integrity, or adding information after substantial changes.
 
 ---
 
@@ -32,406 +30,427 @@ If the project already contains a valid v2 memory system (`.ai/` with 5 files, `
 
 ## 1.1 Collision Detection
 
-Before any content scanning, check whether the project already contains:
+Check whether the project already contains: an `AGENTS.md` at the root; an `.ai/` folder; any other memory system (`memory-bank/`, `.kilocode/`, `.context/`, loose notes); any IDE rules file that may overlap (`CLAUDE.md`, `.cursor/rules/`, `.windsurfrules`, `GEMINI.md`, `.github/copilot-instructions.md`). **Log** what you find for Phase 2. Do not overwrite or delete anything.
 
-- An `AGENTS.md` file at the root.
-- An `.ai/` folder with memory files.
-- Any alternative memory system (e.g., `memory-bank/`, `.kilocode/`, loose notes in `.context/`, etc.).
-- Any IDE-specific rules or system prompt file that may overlap (`CLAUDE.md`, `.cursor/rules/`, `.windsurfrules`, `GEMINI.md`, `.github/copilot-instructions.md`).
-
-If any are found, **log the finding** for mandatory discussion during Phase 2 (Grill Me). Do not overwrite or delete anything during this phase.
+If the project has the v1.0 memory system (4 files), follow **Appendix A** before Phase 4.
 
 ## 1.2 Environment Scan
 
-Use the native file tools available in your environment (e.g., Antigravity: `list_dir`, `view_file`, `grep_search`; Claude Code: `ls` / `read` / `grep`; Cursor: `list_directory` / `read_file`; Codex: equivalent shell tools). **Always exclude from scanning:** `.git/`, `node_modules/`, `dist/`, `build/`, `vendor/`, `.venv/`, `__pycache__/`, `target/`, and any artifact or package cache directory. Scanning depth depends on the project state:
+Use the native file listing/reading tools of your environment. **Always exclude:** `.git/`, `node_modules/`, `dist/`, `build/`, `vendor/`, `.venv/`, `__pycache__/`, `target/`, and any cache directory.
 
-- **Project with documentation:** Read `.md` files (README, specs, implementation plans), key configs (`package.json`, `requirements.txt`, `pyproject.toml`, etc.). **Capture a real directory listing with limited depth (e.g., `list_dir` recursive, max 3 levels) as input for the directory tree in `project_knowledge.md`.**
-- **Project with code but no documentation:** Explore the directory structure, read main entry points and key modules to infer architecture, stack, and patterns. **Capture a real directory listing with limited depth (e.g., `list_dir` recursive, max 3 levels) as input for the directory tree in `project_knowledge.md`.**
-- **Small project (few files but real code):** **Capture a real directory listing** as above.
-- **Empty or near-empty project (< 2 code files):** Log that no usable context was found. Ask the user whether they want to initialize the memory system from scratch *(recommend starting from an implementation plan or structured specification file before generating the memory)*. Do NOT generate a directory tree — the structure will change too much.
+- **Project with documentation:** Read the `.md` files (README, specs, plans) and key configs (`package.json`, `requirements.txt`, `pyproject.toml`, etc.).
+- **Code but no documentation, or a small project:** Read the directory structure, entry points, and key modules to infer architecture, stack, and patterns.
+- For both: **capture a real directory listing, max 3 levels**. It is the input for `## Project Structure`.
+- **Empty or near-empty project (< 2 code files):** log that no usable context was found and ask whether to initialize from scratch *(recommend starting from an implementation plan or specification first)*. Do NOT build a directory tree; the structure will change too much.
 
 ## 1.3 Findings Declaration
 
-Stop and respond in the chat with a structured summary in **bullet points** covering:
+Stop and reply in the chat with bullet points: Detected project type (language, framework, purpose); Documentation found and its quality; Collisions detected; Information gaps.
 
-- Detected project type (language, framework, apparent purpose).
-- Documentation found and its quality/completeness.
-- Collisions detected (pre-existing memory files, if applicable).
-- Information gaps identified that will require interrogation.
-
-Do not generate any files during this phase.
+Do not generate files in this phase.
 
 ---
 
 # PHASE 2: Interrogation ("Grill Me")
 
-Interrogate the user to resolve all ambiguity before generating the files.
+Resolve all ambiguity before generating files.
 
 ## 2.1 Format
 
-Prioritize using interactive question tools (e.g., `ask_question`) to present questions with selectable options and default recommendations whenever the environment supports tool-calling. If the environment limits the number of questions per call, split them into two thematic batches: **Batch 1** — Project scope, stack, versioning, platforms, CI/CD; **Batch 2** — Memory system configuration (autonomy level, synchronization rules). If tool-calling for questions is unavailable, send a numbered list in the chat. Each question must include a recommended answer or default value. If the information was already discovered during Phase 1, **do not ask — use it directly** and declare it as a confirmed finding.
+Prefer interactive question tools (e.g. `ask_question`) with selectable options and a recommended answer. If the tool limits questions per call, use two batches: **Batch 1** — scope, stack, versioning, platforms, CI/CD; **Batch 2** — memory configuration (categories 6–11). Without such a tool, send a numbered list. Every question carries a recommended answer. If Phase 1 already found the answer, **do not ask**: declare it as a confirmed finding.
 
 ## 2.2 Mandatory Categories
 
-If Phase 1 did not yield clear information on the following points, it is **mandatory** to ask about them:
+Ask about any category Phase 1 did not answer. Each category is tagged: `[assume default]` = if unanswered, use a sensible default and declare it; `[no default]` = must be answered explicitly, re-ask once if skipped.
 
-1. **Main objective and project scope** (Core Functionalities / MVP).
-2. **Tech stack and tools** (Languages, Frameworks, Databases).
-3. **Versioning system** (SemVer, CalVer, etc. If they don't have one, suggest SemVer and wait for approval).
-4. **Target platforms or deployment environment** (OS, Cloud, Mobile, Web).
-5. **CI/CD flow, required testing, or validation methods.**
-6. **Autonomy level for `project_knowledge.md`:** Ask whether the AI should update `project_knowledge.md` autonomously without prior confirmation when changes occur (Recommended: `Prior confirmation: ❌ No` for rapid development), or if the AI must propose changes in chat and wait for human approval (`Prior confirmation: ✅ Yes, always`).
-7. **Immediate Documentation Synchronization:** Ask whether to enforce the strict synchronization rule: any modification to code, UI/styles, scripts, or configuration must immediately update the relevant memory files in the same response/turn.
+1. `[assume default]` **Main objective and scope** (core functionality / MVP).
+2. `[assume default]` **Tech stack and tools** (languages, frameworks, databases).
+3. `[assume default]` **Versioning system** (SemVer, CalVer...). If none, suggest SemVer and wait for approval.
+4. `[assume default]` **Target platforms or deployment environment.**
+5. `[assume default]` **CI/CD flow, required testing, or validation methods.**
+6. `[no default]` **Autonomy for `project_knowledge.md`:** the AI updates it without prior confirmation (recommended for rapid development) or proposes changes in chat and waits for approval.
+7. `[no default]` **Immediate Documentation Synchronization:** enforce that any change to code, UI/styles, scripts, or configuration updates the relevant memory files in the same turn?
+8. `[no default]` **Current project version** if not defined in the project (e.g. `v0.1.0`). Used for the first changelog entry. Never invent it.
+9. `[assume default: versioned in Git]` **`.ai/` in Git:** version the folder (recommended for teams) or keep it local via `.gitignore`.
+10. `[assume default: stub if not auto-loaded]` **Client auto-loads `AGENTS.md`?** If the IDE/client does not, install the stub from Template B.6 in its rules file (`CLAUDE.md`, `.cursor/rules/`, `GEMINI.md`).
+11. `[no default]` **Recoverable deletion:** install the rule that forbids permanent deletion (`rm`, `rm -rf`, `del`, `Remove-Item -Force`, `unlink`, `shutil.rmtree`) and sends every removal to the Recycle Bin or `_trash/`? Recommended: yes.
 
-8. **Initial project version:** Ask what version the project is currently at if not defined in the project (e.g., `v0.1.0`, `v1.0.0`). This answer will be used as the initial entry header in `changelog.md`. Do not default or invent a version.
-9. **`.ai/` Git versioning:** Ask whether the user wants to version the `.ai/` folder in Git (recommended for teams and continuity) or keep it local via `.gitignore`.
-10. **Client auto-loads `AGENTS.md`:** Check whether the user's IDE/client auto-loads `AGENTS.md` at session start. If not, offer to inject a 3-line stub into the client's rules file (e.g., `CLAUDE.md`, `.cursor/rules/`, `GEMINI.md`) pointing to the Context Protocol (optional).
-
-The agent may formulate additional questions at its discretion on areas such as: performance or security constraints, external integrations, data models, code conventions, or any aspect needed to generate a high-quality memory.
+Optionally ask about performance or security constraints, external integrations, data models, or code conventions.
 
 ## 2.3 Collision Resolution
 
-If a pre-existing `AGENTS.md` or another memory system was detected during Phase 1, explicitly discuss with the user:
+If Phase 1 found an existing `AGENTS.md` or another memory system, discuss with the user: which of its rules to keep (those that do not conflict); which old systems to deprecate; confirm that `AGENTS.backup.md` will be created. **Faithful migration:** read old memory files in full and transfer all relevant content without summarizing or discarding. Zero data loss.
 
-- Which rules from the original file to preserve (those that do not conflict with the new memory system).
-- Which previous memory systems to deprecate.
-- Confirm that a backup of the original `AGENTS.md` will be created before overwriting.
-- **Faithful data migration:** If previous memory files exist (e.g., `memory-bank/`), read them in full before generating the new system. Transfer all relevant content completely — do not summarize, condense, or discard any information. Zero data loss is mandatory in migrations.
+## 2.4 Mandatory Pause
 
-## 2.4 Incomplete Responses
-
-If the user does not answer all mandatory questions, the agent must:
-
-1. Use sensible defaults for unanswered project-context questions (categories 1–5) and explicitly declare which defaults were assumed.
-2. **Never assume defaults** for memory-configuration questions (categories 6–7: autonomy level, documentation synchronization). These must be answered explicitly — re-ask once if skipped.
-
-## 2.5 Mandatory Pause
-
-Wait for the user's explicit confirmation before advancing to generation. Do not proceed to Phase 3 without a green light.
+Wait for the user's explicit confirmation before Phase 3.
 
 ---
 
 # PHASE 3: Memory System Generation
 
-Physically generate all 5 files on disk using `write_to_file` (or the native write tool available in your environment — `write_to_file`, `write_file`, `write`, or equivalent shell redirection). If a previous `AGENTS.md` exists, create a backup (`AGENTS.backup.md`) first before overwriting.
+Write all 5 files to disk with the native write tool. If an `AGENTS.md` exists, create `AGENTS.backup.md` first. If a tool is missing (`grep`, `list_dir`, `write_to_file`), use the native equivalent of your environment.
 
-> **Tool Fallbacks:** If `grep` is unavailable, use the environment's native search (e.g., `grep_search`, `search`, `find_in_files`, or read the file and search in memory). If `list_dir` is unavailable, use the native directory listing tool (`ls`, `dir`, `list_directory`). If `write_to_file` is unavailable, use the native write tool (`write_file`, `write`, `create_file`). The skill must work with whatever tools the host environment provides.
+## 3.1 Procedure
 
-> **Critical Language Rule:** `AGENTS.md` is always written in **technical English**. The remaining 4 files inside `.ai/` are always written in the **user's native language** (e.g., Spanish, English, Portuguese, etc.), regardless of the language of this skill document. **Structural tokens (headings, field names, state labels) are FIXED in English** — only prose/content is in the user's native language. This ensures grep, verification, and tooling remain stable across languages.
+1. Create `.ai/` if it does not exist.
+2. For each file, copy the matching template from Appendix B **literally** to its destination and replace every `{{MARKER}}` following the Marker Reference below. Do not rephrase, reorder, or drop template text, except where a marker rule says to delete a line or section.
+3. **Resolve every Grill Me option at generation time.** The generated files contain only the chosen branch, never an "if configured" clause or an unresolved `{{...}}`.
+4. **Language:** `AGENTS.md` is written in **technical English**. The other 4 files are written in the **user's native language**. Static template text (headings, field names, state labels) stays in English exactly as written; only the content that fills the markers is in the user's language. This keeps `grep` and verification stable.
+5. **Merging with a previous `AGENTS.md`:** the Memory Protocol and Memory File Formats sections take absolute priority. Non-conflicting user rules go into `{{PROJECT_RULES}}` (or additional sections).
+6. `decisions.md` is created with its header only. Do not invent decisions.
+7. **Apply categories 9 and 10.** Category 9 local → add `.ai/` to `.gitignore` (create the file if missing). Category 10 stub → write Template B.6 into the client's rules file; if that file exists, add the stub at the top without removing its content.
 
-## 3.1 `AGENTS.md` — Agent Constitution
+## 3.2 Marker Reference
 
-- **Location:** Project root.
-- **Language:** Strictly **TECHNICAL ENGLISH** (regardless of conversation language).
-- **Who modifies it post-creation:** Human only (or AI under explicit human instruction). The AI never edits this file on its own initiative.
-
-### Minimum Required Structure:
-
-**`## Role & Identity`**
-Define the agent's technical profile for this project:
-
-- Role title (e.g., *Senior Python Engineer*, *Full-Stack Architect*).
-- Project-specific expertise stack.
-- Primary objective for each work session.
-- Sub-section `### Core Competencies` listing critical knowledge areas.
-
-**`## The Context Protocol`**
-Mandatory initialization ritual at the start of every session.
-
-> **Session definition:** A session is a new conversation instance with the agent in this project. A new chat window or API call constitutes a new session; an IDE restart without a new conversation does not.
-
-1. Read `AGENTS.md` (this file — if not auto-loaded by the environment, read it explicitly).
-2. Read `.ai/project_knowledge.md` (foundational encyclopedia).
-3. Read `.ai/active_context.md` (current dynamic state).
-4. Acknowledge synchronization by emitting `[Context: Active]` as the first line of the response.
-
-**Session Close Protocol:** When the agent detects that a session is ending (implementation plan completed, important task finished, or user signals closure), it must **propose** running the close procedure: execute the Task Close Checklist, persist any pending decisions to `decisions.md`, update `active_context.md`, and produce a 6-section handoff summary. Do not wait for a magic phrase — detect contextually and suggest closure.
-
-> `changelog.md` is **NOT** included in the startup reading. It is only consulted upon explicit request by the human. The changelog grows without limit by design; including it in the mandatory reading would consume tokens unnecessarily.
-
-**`## Memory Routing`**
-
-Route every piece of information with one question: "What does a future agent need this for?"
-
-| If it answers... | It goes to | Lifetime |
-| --- | --- | --- |
-| "What is true right now / what do I do next?" | `.ai/active_context.md` | Current phase only |
-| "Why is it this way? What must not be redone or reopened?" | `.ai/decisions.md` | Until superseded |
-| "What happened and when?" | `.ai/changelog.md` | Forever (append-only) |
-| "How is the project built?" (stack, structure, conventions) | `.ai/project_knowledge.md` | Until the architecture changes |
-| "How must the agent behave?" | `AGENTS.md` | Human-edited only |
-
-`active_context.md` is a handoff note for the next task, not a history. If an item describes the past and is not needed to continue, it does not belong there.
-
-**`## Decision Capture`**
-
-Write to `.ai/decisions.md` in the same turn when any of these happens. Do not wait to be asked and do not postpone to session end:
-- A design, architecture, tool, library, or convention is chosen after weighing options.
-- The user confirms ("do that", "agreed"), rejects ("no, X instead"), or states a lasting preference ("always do it this way").
-- The user issues a persistent instruction ("don't forget that...", "remember that...", "always ensure...") — these are treated as lasting preferences.
-- A bug is fixed and the root cause is non-obvious, or an approach is tried and discarded (Technical Discard).
-- A non-obvious gotcha, limitation, or environment fact is discovered.
-
-**Admission Test** — Record only if **both** are true:
-| Check | Question |
-|-------|----------|
-| 1. Relevance | Could ignoring this lead someone to a worse choice later? |
-| 2. Unrecoverable | Is this **not** recoverable from code, git history, or changelog? |
-
-> If unsure → write the **one-line form** instead of skipping.
-
-**Conflict Surfacing & Deduplication** — Before writing, `grep` `decisions.md` for the same `Topic`:
-| Scenario | Action |
-|----------|--------|
-| Same Topic, more detail | Edit existing entry in place. |
-| Changed course (new decision contradicts old) | Create new entry; mark old as `[REPLACED->D-NN]`. |
-| Reverses an **Active** architecture/convention decision | **Ask user first** (one line), then proceed. |
-| Any other case | Proceed and report in one line. |
-
-**`## Retrieval Order`**
-
-Before taking a design decision, or when the user asks **"what did we do"**, **"how did we solve"**, **"remember"**, **"continue as before"**, **"as we agreed"**, **"as discussed"**, **"per our decision"**, **"following our previous choice"**, or any phrase referencing a prior decision/conversation, search in this order and stop at the first hit: `active_context.md` (Should already be loaded) → decision headings (`grep "^### D-"`) then open the matching entry → `changelog.md` by keyword or ID (avoid loading the full file unless necessary).
-
-**`## Active Context Hygiene`**
-
-> **Handoff Note definition:** `active_context.md` is a **session-to-session handoff note**, not a history or changelog. Its purpose is to give the next agent/session the minimal context to continue working: current objective, project state, key changes (max 10), active bugs only, next steps, and key files. It must stay under 125 lines. Past items that are not needed to continue belong in `changelog.md` (archival) or `decisions.md` (reasoning).
-
-`active_context.md` starts with a metadata header, followed by `## Current Objective` as the first section (the goal of the current phase). Check these signals whenever you update the file, finish a task, or the user changes direction. If any is true and the current work is not a direct continuation of `Current Objective`, propose archiving in ONE line and wait for approval:
-1. A plan, phase, or large task was just completed.
-2. The user moved to a different topic, module, or working folder than `Current Objective`.
-3. The file exceeds 125 lines.
-4. Resolved or finished items are still listed.
-
-Archiving procedure (non-destructive): (a) append a summary of the finished phase to the unversioned block of `changelog.md` under `### Update YYYY-MM-DD`; (b) make sure durable decisions are already in `decisions.md`; (c) rewrite `active_context.md` keeping only the Mandatory Remnant plus the new `Current Objective`; (d) confirm in one line. Never assign a version number.
-
-**`## Context Reset Recovery`**
-
-If you detect a compaction, summary injection, or context reset: (1) before anything else, write the current state into `active_context.md` and any pending decision into `decisions.md`; (2) re-read the Context Protocol files; (3) continue the task and emit `[Context: Active]`.
-
-**`## Task Close Checklist`**
-
-After each task, ask silently: Did we decide, confirm, or reject something? Did we learn something non-obvious or fix a bug with a root cause? Did the user state a lasting preference? Did the phase end? If yes to any, apply the matching rule above now. Memory work is bookkeeping: it never replaces the answer, and any memory report to the user is one line at most.
-
-**`## Anti-Error Rules & Development Standards`**
-Critical rules derived from real project errors and safety invariants. Organize them into numbered sub-sections by area (Safety, State, Logging, UX, Architecture, etc.).
-
-*Mandatory Foundational Rule (always included in all projects):*
-
-- **Zero Destructive Deletion / Mandatory Recycle Bin:** Permanent or forced deletions are strictly forbidden (`rm`, `rm -rf`, `del`, `Remove-Item -Force`, `unlink`, `shutil.rmtree`). Files may only be discarded if explicitly ordered by the user, and ALWAYS sent to the system Recycle Bin (in Windows via PowerShell `[Microsoft.VisualBasic.FileIO.FileSystem]::DeleteFile($path, 'OnlyErrorDialogs', 'SendToRecycleBin')` or moving to `_trash/`), or the native OS equivalent.
-
-- **No Secrets in Memory Files:** Never write API keys, tokens, passwords, credentials, or any secret value into the 5 memory files. Reference them only by variable name or file location (e.g., "`API_KEY` — see `.env`").
-
-*Conditional Rules (derived from Grill Me):*
-
-- If configured in Grill Me: **Documentation Synchronization Rule:** Any change to code, styles, configuration, scripts, or interface behaviors must immediately be reflected in relevant memory files (`project_knowledge.md` and/or `active_context.md`) in the same response/turn.
-
-If the project is new and has no error history, populate remaining sub-sections with code conventions and standards agreed upon during the Grill Me.
-
-**`## Memory Maintenance Protocol`**
-Explicit instructions on how the AI must maintain the project memory. Must include:
-
-*Update rules table:*
-
-| File | Who updates | When | Prior confirmation |
-| --- | --- | --- | --- |
-| `AGENTS.md` | Human only (or AI under explicit human instruction) | Philosophy or global rule changes | N/A |
-| `project_knowledge.md` | AI proposes → human approves (or AI autonomously, as agreed in Grill Me) | Architectural changes, new stack, design decisions | As configured in Phase 2 |
-| `active_context.md` | AI autonomously | Upon completing a **significant task** (see definition below) | ❌ No |
-| `decisions.md` | AI autonomously | When Decision Capture conditions are met | ❌ No |
-| `changelog.md` | AI drafts → human reviews | When closing a version or under partial archival | ✅ Yes, always |
-
-*Definition of "Significant Task" (for `active_context.md` updates):* A task is significant if it meets **at least one** of the following criteria:
-
-> **Proactive Archival Threshold:** At ~100 lines, warn the user and recommend archival before hitting the 125-line hard limit.
-
-- Modified or created at least one file containing business logic, architecture, configuration, or UI/interface.
-- Resolved or identified a registered bug (`ID-XX`).
-- Introduced, removed, or changed a dependency, tool, or technology in the stack.
-- Changed a design decision or added a Technical Discard.
-- Produced a result visible to the end user (new feature, behavior change, fix).
-
-> If **Immediate Documentation Synchronization** was enabled during Grill Me, this threshold does not apply — `active_context.md` is updated on every response/turn that modifies any file.
-
-*Archival Rules* (`active_context.md` → `changelog.md`): Triggered by AI proposal, human approval. Two valid paths:
-
-1. *Version close:* The human declares the close. Move all accumulated content from `active_context.md` for the closing version into a new entry in the changelog. Any Technical Discards accumulated during the session must be consolidated into `decisions.md`, not into `changelog.md`.
-2. *Partial archive:* The AI proposes moving specific content (phase complete, topic changed, file >125 lines, RESOLVED/WONTFIX bugs still listed in Active Bugs). Human approves. Move only the indicated content to the active unversioned block (`## [Unversioned] — in progress`).
-
-*Mandatory Remnant Rule:* `active_context.md` **must never be left empty** after an archival or version close. It must permanently retain:
-
-1. Current project status and a 1–3 line summary of the last state.
-2. Active bugs and technical debt section (`## Active Bugs & Technical Debt`).
-3. Prioritized pending tasks for the next session (`## Next Steps`).
-4. Last Bug ID tracker: `Last Bug ID: ID-XX` (set to `ID-00` if no bugs have been registered yet). This prevents ID reuse when `changelog.md` is not loaded at startup.
-
-*Bug IDs:* Global sequential ID system (`ID-01`, `ID-02`...). IDs are permanent: never reassigned or reused after a bug is resolved. Referenced in the changelog with the format `[Resolves ID-XX]`.
-
-*Chronological Session Separation:* When updating `active_context.md` or `changelog.md`, NEVER overwrite or merge the date of changes from previous sessions. If adding changes from a new session to an existing version, group them under a sub-heading with the date (e.g., `### Update YYYY-MM-DD`) to preserve the real chronological history.
-
-*Versioning (Immutable Human Authority):* The version number is ALWAYS assigned exclusively by the human. The AI **must never** assign, infer, propose, increment, or change any version number autonomously — including after a version close, archival, or major feature completion. The AI must read and use the last version explicitly stated by the user and treat it as frozen until the human explicitly declares otherwise.
-
-**`## Canonical Documentation`**
-Include an explicit map of the memory system files and their purpose:
-
-- `AGENTS.md` → The core constitution containing the agentic rules and the memory maintenance protocol for this project. Modified by the human (or AI under explicit human instruction).
-- `.ai/project_knowledge.md` → Foundational project encyclopedia.
-- `.ai/active_context.md` → Live state of the current phase (handoff note).
-- `.ai/decisions.md` → Structured decisions, discards, discoveries with lifecycle and conflict surfacing.
-- `.ai/changelog.md` → Chronological history (append-only, consulted on demand).
-
-If migrated from a previous system, include a deprecation note (e.g., `memory-bank/ → DEPRECATED. Do not read or update.`).
-
-**Merging with pre-existing rules:** If there was a previous `AGENTS.md`, the memory system sections (Context Protocol, Memory Maintenance Protocol, Canonical Documentation) take absolute priority. User rules that do not conflict are integrated under the corresponding sections (typically under Anti-Error Rules or as additional sections).
+| Marker | Fill with |
+| --- | --- |
+| `{{PROJECT_NAME}}`, `{{ROLE_TITLE}}`, `{{EXPERTISE}}`, `{{SESSION_OBJECTIVE}}`, `{{CORE_COMPETENCIES}}` | Technical profile for this project (e.g. *Senior Python Engineer*), its expertise stack, the objective of each session, and a bullet list of critical knowledge areas. |
+| `{{AUTONOMY_RULE}}` | Category 6. Autonomous → `AI updates directly, then reports in one line`. Confirm → `AI proposes in chat, edits after human approval`. |
+| `{{IF_SYNC}}` | Category 7. Yes → remove only the marker. No → **delete the whole line**. |
+| `{{IF_RECOVERABLE_DELETE}}` | Category 11. Yes → remove only the marker. No → **delete the whole line**. |
+| `{{DEPRECATION_NOTE}}` | If migrated from another system: e.g. `memory-bank/ → DEPRECATED. Do not read or update.` Otherwise delete the line. |
+| `{{PROJECT_RULES}}` | Numbered sub-sections by area (Safety, State, Logging, UX, Architecture...) with rules derived from real errors found in Phase 1 and conventions agreed in Grill Me. New project with no error history: conventions only. |
+| `{{VERSION}}` | Category 8, written as `vX.Y.Z` (add the `v` if the user omits it). |
+| `{{DATE}}` | Today, `YYYY-MM-DD`. |
+| `{{PHILOSOPHY}}`, `{{TECH_STACK}}`, `{{ARCHITECTURE_ROWS}}` | From Phases 1–2. Philosophy: why the project exists, what problem it solves, what user experience it seeks. Tech stack as bullets with version and justification. Architecture as table rows. |
+| `{{PROJECT_TREE}}` | Built from the real listing of 1.2, never from memory, following the Project Structure rules in the AGENTS template. Near-empty project: one line saying it will be generated when the project has code. |
+| `{{DATA_FLOW}}` | Diagram (Mermaid or other) of a typical operation, so the agent can follow it without reading code. Recommended for complex projects. If not needed, **delete the whole `## Data Flow` section, heading included**. |
+| `{{OBJECTIVE}}`, `{{STATE}}`, `{{NEXT_STEPS}}`, `{{KEY_FILES}}` | Initial content for `active_context.md`, within the limits of the AGENTS template. `{{OBJECTIVE}}` states the phase goal and the working folder. |
+| `{{BASELINE_NOTE}}` | One line saying the memory system was installed. |
 
 ---
-
-## 3.2 `.ai/project_knowledge.md` — Foundational Encyclopedia
-
-- **Location:** `.ai/project_knowledge.md` (create the `.ai/` directory if it does not exist).
-- **Language:** The user's native language.
-
-### Minimum Required Structure:
-
-- Metadata header: `> **Current Version:** vX.Y.Z (human-assigned, never modified by AI)` — placed at the very top of the file so the agent reads the active version without consulting `active_context.md`.
-- `## Design & Product Philosophy` — Why the project exists, what problems it solves, what user experience is sought.
-- `## Tech Stack` — Exhaustive list of the stack with versions and justifications. Format: bullets, not prose.
-- `## Project Structure` — **Mandatory section.** Commented directory tree in a `text` code block using box-drawing characters (`├──`, `│`, `└──`, `│   `). Built from a real directory listing taken in this phase (`list_dir` or equivalent), never from memory. Rules:
-  1. Root line: project folder name followed by `/`.
-  2. List ALL **relevant** directories (exclude noise: `.git`, `node_modules`, `dist`, `build`, `vendor`, `.venv`, `__pycache__`, `target`, caches; also exclude empty dirs and dirs with only non-useful content).
-  3. Every directory line gets a trailing `#` comment (≤12 words) describing its purpose and key contents.
-  4. Under each directory, list **relevant files** using the same box-drawing style. Each file line gets a trailing `#` comment. Include: entry points, key configs, canonical docs, core modules, main scripts. Omit: lockfiles, generated output, bulk assets, test files, minor utilities; collapse repeated files into one line (`*.png`).
-  5. Annotate special directories in the comment: gitignored, generated, backups, trash, read-only, source of truth.
-  6. Beyond 4 levels deep, collapse with `...` and a comment.
-  7. Keep in sync in the same turn whenever a directory or relevant file is created, moved, or deleted. This is factual maintenance and is exempt from the `project_knowledge.md` approval setting.
-- `## Architecture` — Single Responsibility Table (`Component | Single Responsibility | Critical Restriction`).
-- `## Design Decisions Pointer` — Single line: `> See .ai/decisions.md for all design decisions, technical discards, discoveries, and conventions with lifecycle tracking.`
-- `## Data Flow` *(optional, recommended for complex projects)* — Diagram (Mermaid or other) showing the lifecycle of a typical system operation, allowing the AI to understand the flow without reading code.
-
----
-
-## 3.3 `.ai/active_context.md` — Live State (Handoff Note)
-
-- **Location:** `.ai/active_context.md`.
-- **Language:** The user's native language.
-
-### Minimum Required Structure:
-
-- Metadata header: `> **Last updated:** YYYY-MM-DD | **Version:** vX.Y.Z | **Last Bug ID:** ID-XX`
-- `## Current Objective` — **Anchor for archival detection.** A short prose summary (1–3 sentences) of the phase goal and working folder, followed by bullet points detailing specific objectives (short, one per bullet).
-- `## Current State` — A short prose summary (1–3 sentences) of the project's health, followed by bullet points for key details (stability, blockers, performance notes, etc.).
-- `## Current Phase Changes` — A brief introductory sentence, then bullet points (max 10). Each bullet: file path + brief reason for change. Extended reasoning goes to `decisions.md`.
-- `## Active Bugs & Technical Debt` — Each entry includes: status (`[OPEN]`/`[MITIGATED]`), one-line description of the problem/impact, affected file(s), and root cause if known. `RESOLVED`/`WONTFIX` move to changelog on next archive.
-- `## Next Steps` — Numbered prioritized list (one line each).
-- `## Key Files in Play` — List of actively edited/relevant files (soft limit 12), each with a one-line purpose (equivalent to Engram's `Relevant Files`).
-
-> **Hard limit:** File must not exceed 125 lines. **Proactive threshold:** At ~100 lines, warn the user and recommend archival. When updating, check the four archival signals (phase complete, topic changed, file >125 lines, RESOLVED/WONTFIX bugs still listed in Active Bugs). If any is true and work is not a direct continuation of `Current Objective`, propose archiving in one line and wait for approval. Never assign a version number.
-
----
-
-## 3.4 `.ai/decisions.md` — Structured Decisions
-
-- **Location:** `.ai/decisions.md`.
-- **Language:** The user's native language.
-
-### Minimum Required Structure:
-
-- Metadata header: `> **Last updated:** YYYY-MM-DD | **Last decision:** D-00`
-- Quick reference: `grep "^### D-"` lists all decisions with state. Replaced/Obsolete are preserved, never deleted.
-- Each decision as a level-3 heading with permanent ID and state:
-  ```markdown
-  ### D-01 [ACTIVE] Choose Zustand over Redux
-  - **Topic:** architecture/state-global
-  - **Type:** decision | discard | discovery | convention | preference
-  - **Date:** YYYY-MM-DD
-  - **What:** one sentence on what was decided.
-  - **Why:** motivation and discarded alternatives with reasons.
-  - **Where:** affected files or paths.
-  - **Learned:** gotchas or surprises (omit if not applicable).
-  - **Reviewed:** YYYY-MM-DD (optional)
-  ```
-- Short form allowed for quick captures:
-  ```markdown
-  ### D-02 [ACTIVE] Avoid polling in proxy (short form)
-  - **Topic:** architecture/proxy · **Type:** discard · **Date:** YYYY-MM-DD · Caused port 9194 blocking; uses event instead.
-  ```
-- Heading states: `[ACTIVE]`, `[REPLACED->D-NN]`, `[OBSOLETE]`.
-- **Rule:** Update `Last decision` in header on every new `D-NN`. Mark `Reviewed` when closing a version.
-- **Rule:** Generate only the header and quick-reference line. Do not invent decisions. IDs are permanent (like Bug IDs).
-- **Conflict surfacing:** Before writing, grep for the same `Topic`. Same decision with more detail → edit in place. Changed course → new entry + mark old as `[REPLACED->D-NN]`. If reversing an Active architecture/convention decision, ask user first; otherwise proceed and report.
-
----
-
-## 3.5 `.ai/changelog.md` — Chronological History
-
-- **Location:** `.ai/changelog.md`.
-- **Language:** The user's native language.
-- **Not read at session startup.** Only consulted upon explicit human request.
-
-### Minimum Required Structure:
-
-- Group changes under version headings (`## [vX.Y.Z] - YYYY-MM-DD`) and/or session dates (`### Update YYYY-MM-DD`).
-- Order: append-only in content; newest blocks inserted at the top. Historical entries are never modified or overwritten; new entries are always inserted at the top of the file. The immutability principle applies to existing entries, not to insertion position.
-- **Changelog principle:** summarize phases, do not log tool calls.
-- For a brand-new project, initialize with a base entry using the version declared by the user in Grill Me (category 8). Never default or infer a version number.
-- References to resolved bugs use the format `[Resolves ID-XX]`.
-
-**Unversioned block for partial archives:** A block `## [Unversioned] — in progress` is maintained at the top of the changelog (newest entries first) to receive summaries from partial archives without the AI inventing version numbers. When the human closes a version, this block is renamed to `## [vX.Y.Z] - YYYY-MM-DD`. The AI never assigns version numbers.
-
----
-
-### Canonical Tree Example (Phase 3.2)
-
-```text
-project-root/
-├── src/                    # Core application source
-│   ├── components/         # UI components
-│   ├── services/           # Business logic & API
-│   │   └── api.ts          # API client & endpoints
-│   └── utils/              # Helpers & shared utilities
-├── tests/                  # Test suites
-├── docs/                   # Documentation
-├── package.json            # Dependencies & scripts
-└── README.md               # Project overview
-```
 
 # PHASE 4: Post-Generation Review
 
 After creating all 5 files:
 
-1. Run `list_dir` on `.ai/` and verify the existence of `AGENTS.md` at the project root to confirm all files were written correctly.
-2. **Verification checklist (all must pass):**
-   - `project_knowledge.md` contains `## Project Structure` that matches a real `list_dir` listing (excluding noise dirs).
-   - `decisions.md` exists with header and quick-reference line (`grep "^### D-"`).
-   - `active_context.md` has `## Current Objective` filled in (not empty).
-   - `AGENTS.md` contains `## Memory Routing`, `## Decision Capture`, `## Retrieval Order`, `## Active Context Hygiene`, `## Context Reset Recovery`, `## Task Close Checklist`.
-   - No secrets in any memory file (scan for API keys, tokens, passwords).
-3. Request a review from the user of the generated system, focusing especially on `project_knowledge.md` (the foundational encyclopedia). Explicitly ask whether any data is incorrect, incomplete, or if they wish to add, remove, or correct sections.
-4. Apply any requested corrections before declaring the installation complete.
+1. List `.ai/` and confirm `AGENTS.md` exists at the root.
+2. **Checklist (all must pass):**
+   - No `{{` remains in any generated file, and `AGENTS.md` contains no "if configured" / "as configured" clause.
+   - `AGENTS.md` contains `## Memory Protocol` (sections 1–5) and `## Memory File Formats`.
+   - `project_knowledge.md` has `## Project Structure` matching the real listing.
+   - `active_context.md` has the 6 sections and `## Current Objective` is filled in.
+   - `decisions.md` and `changelog.md` exist with their header.
+   - No secrets in any memory file.
+   - The Grill Me choices are applied: the sync line and the deletion line exist only if accepted; `.gitignore` and the stub match categories 9 and 10.
+3. Ask the user to review the result, especially `project_knowledge.md`: anything incorrect, incomplete, or to add or remove.
+4. Apply corrections before declaring the installation complete.
 
 ---
 
 # Operational Constraints
 
-1. **Mandatory physical writing:** Do not just display content in the chat. Use `write_to_file` to create each file on disk.
-2. **Backup before overwrite:** If a previous `AGENTS.md` exists, create `AGENTS.backup.md` before replacing it.
-3. **Rule priority in merges:** When merging with a pre-existing `AGENTS.md`, the memory system sections take absolute priority over the previous file's rules.
-4. **Human versioning:** Never invent, infer, or propose version numbers. Ask the user if the current version is unknown.
-5. **Post-installation autonomy:** Once generated, the memory system survives autonomously thanks to the directives written into `AGENTS.md`. This skill does not intervene in subsequent maintenance.
-6. **Zero Destructive Deletion:** The agent must never use forced or permanent deletion commands (`rm`, `rm -rf`, `del`, `Remove-Item -Force`, `unlink`, `shutil.rmtree`). All removals must go to the system Recycle Bin or `_trash/`.
+1. **Write to disk.** Do not only display content in the chat.
+2. **Backup before overwrite:** Create `AGENTS.backup.md`.
+3. **Post-installation autonomy:** once generated, the system runs on the rules inside `AGENTS.md`. This skill does not intervene in later maintenance.
+4. **No permanent deletion during installation.** While running this skill, never use `rm`, `rm -rf`, `del`, `Remove-Item -Force`, `unlink`, or `shutil.rmtree`. On Windows: `[Microsoft.VisualBasic.FileIO.FileSystem]::DeleteFile($path, 'OnlyErrorDialogs', 'SendToRecycleBin')`. Elsewhere, the OS Recycle Bin or `_trash/`. The same rule is written into `AGENTS.md` only when the user accepts category 11.
 
 ---
 
-# APPENDIX: Migration v1 → v2 (for projects already using v1.0)
+# APPENDIX A: Migration v1 → v2 (projects already using v1.0)
 
-When the skill is invoked in a project that already has the v1.0 memory system (4 files), perform the following migration **before** declaring installation complete:
+Perform before Phase 4:
 
-1. **Backup:** Create `AGENTS.backup.md` from the existing `AGENTS.md` (standard rule).
-2. **Create `decisions.md`:** Generate the new file with header and quick-reference line. **Find the historical decisions section in `project_knowledge.md` (search for headings containing "decision", "design", "historical", "discard", or "archived" — case-insensitive) and confirm with the user before moving. Move the entire matched section textually into `decisions.md`**, assigning sequential `D-NN` IDs without rewriting content (zero data loss). Leave a pointer in `project_knowledge.md`: `> See .ai/decisions.md for all design decisions, technical discards, discoveries, and conventions with lifecycle tracking.`
-3. **Restructure `active_context.md`:**
-   - Content describing the past or resolved items → append to the unversioned block in `changelog.md` under `### Update YYYY-MM-DD — phase name`.
-   - Decisions with extended reasoning → ensure they're in `decisions.md` (already done in step 2).
-   - Remaining content → rewrite into the new structure: `## Current Objective` (short prose + bullets), `## Current State` (short prose + bullets), `## Current Phase Changes` (intro + bullets, max 10), `## Active Bugs & Technical Debt` (status + description + file + root cause), `## Next Steps` (numbered), `## Key Files in Play` (one-line purpose each, soft limit 12).
-4. **Generate `## Project Structure`:** Run a real `list_dir` (recursive, max 3-4 levels, excluding noise) and build the commented tree per the rules in Phase 3.2.
-5. **Update `AGENTS.md`:** Insert the new sections (`## Memory Routing`, `## Decision Capture`, `## Retrieval Order`, `## Active Context Hygiene`, `## Context Reset Recovery`, `## Task Close Checklist`, updated `## Memory Maintenance Protocol` table with `decisions.md` row, updated `## Canonical Documentation` with 5 files). Preserve user's custom rules from the original `AGENTS.md` under appropriate sections.
-6. **Update `changelog.md`:** Ensure the unversioned block `## [Unversioned] — in progress` exists at the top for receiving partial archives.
-7. **Verify:** Run the Phase 4 checklist on the migrated system.
+1. **Backup:** `AGENTS.backup.md` from the existing `AGENTS.md`.
+2. **Create `decisions.md`** from Template B.4. **Find the historical decisions section in `project_knowledge.md`** (headings containing "decision", "design", "historical", "discard", or "archived", case-insensitive) and confirm with the user before moving it. Move the matched section textually into `decisions.md`, assigning sequential `D-NN` IDs without rewriting content (zero data loss). Leave this pointer in `project_knowledge.md`: `> See .ai/decisions.md for all design decisions, technical discards, discoveries, and conventions with lifecycle tracking.`
+3. **Restructure `active_context.md`** into the 6 sections of Template B.3:
+   - Past or resolved content → append to the unversioned block of `changelog.md` under `### Update YYYY-MM-DD`.
+   - Decisions with extended reasoning → already in `decisions.md` (step 2).
+   - Remaining content → rewrite into the new sections, within the limits of the AGENTS template.
+4. **Generate `## Project Structure`** from a real listing (max 3 levels, noise excluded).
+5. **Regenerate `AGENTS.md`** from Template B.1, preserving the user's custom rules from the old file in `{{PROJECT_RULES}}`.
+6. **`changelog.md`:** make sure `## [Unversioned] — in progress` exists at the top.
+7. **Verify** with the Phase 4 checklist.
+
+---
+
+# APPENDIX B: Templates
+
+Templates are wrapped in four-backtick fences. Copy only what is inside the fence.
+
+## B.1 `AGENTS.md`
+
+````markdown
+# AGENTS.md — {{PROJECT_NAME}}
+
+## Role & Identity
+
+- **Role:** {{ROLE_TITLE}}
+- **Expertise:** {{EXPERTISE}}
+- **Session objective:** {{SESSION_OBJECTIVE}}
+
+### Core Competencies
+
+{{CORE_COMPETENCIES}}
+
+## Memory Protocol
+
+### 1. Session start
+
+1. Read `.ai/project_knowledge.md` and `.ai/active_context.md` (and this file, if your client did not auto-load it).
+2. First line of your first reply: `[Context: Active]`.
+3. Do not read `.ai/changelog.md` unless asked (it grows without limit; reading it wastes tokens).
+
+A session is a new conversation with the agent in this project. An IDE restart without a new conversation is not a new session.
+
+### 2. While working — where things go
+
+Write to `.ai/decisions.md` in the same turn it happens. Do not wait to be asked and do not postpone to session end.
+
+| When this happens | Write to | How |
+| --- | --- | --- |
+| User says "always", "never", "remember", "don't forget" | `.ai/decisions.md` | New `D-NN`, Type: preference |
+| We chose between two or more named options | `.ai/decisions.md` | New `D-NN`, Type: decision |
+| User accepts or rejects a proposal ("do that", "no, X instead") | `.ai/decisions.md` | New `D-NN`, Type: decision |
+| A convention was established, or a non-obvious environment fact was found | `.ai/decisions.md` | New `D-NN`, Type: convention / discovery |
+| An approach was tried and abandoned | `.ai/decisions.md` | New `D-NN`, Type: discard |
+| Something failed or surprised us and we found the cause or limit | `.ai/decisions.md` | New `D-NN`, Type: discovery |
+| A file or folder was created, moved, or deleted | `.ai/project_knowledge.md` | Update `## Project Structure` (no approval needed) |
+| Stack or architecture changed | `.ai/project_knowledge.md` | Follow the "Edited by" column in section 5 |
+| A bug was found | `.ai/active_context.md` | Add to Active Bugs with the next `ID-XX` |
+| A bug was fixed | `.ai/active_context.md` | Mark it `RESOLVED`; it moves to the changelog as `[Resolves ID-XX]` on the next partial archive |
+
+{{IF_SYNC}}Any change to code, UI/styles, scripts, or configuration: update the relevant memory files in the same turn.
+
+Record a `D-NN` only if ignoring it could lead to a worse choice later **and** it is not recoverable from code, git history, or changelog. If unsure, write the one-line form instead of skipping.
+
+Before adding a `D-NN`, search `.ai/decisions.md` for the same `Topic:` prefix and keyword. Same idea with more detail → edit that entry. Opposite idea → add a new entry and mark the old one `[REPLACED->D-NN]`; if the old one is an `[ACTIVE]` `arch/` or `convention/` entry, ask the user first (one line). Any other case: proceed and report in one line.
+
+Before taking a design decision, or when the user refers to past work or a prior agreement (e.g. "as we agreed", "what did we do", "remember", "continue as before"), search in this order and stop at the first hit: `.ai/active_context.md` → `grep "^### D-" .ai/decisions.md`, then open the matching entry → `.ai/changelog.md` by keyword or ID.
+
+Formats and limits for every file are in `## Memory File Formats`.
+
+### 3. After each task — 3 questions
+
+1. Did we decide, reject, or learn something? → apply section 2.
+2. Did the state or next steps change? (a file with logic, architecture, config, or UI was created or modified; a bug ID was opened or resolved; the stack changed; a decision or discard was added; the user sees a new result) → update `.ai/active_context.md`.
+3. Is any section of `active_context.md` at its limit, did a plan or phase finish, or did the user move to a different topic, module, or working folder? → propose archiving in one line and wait for approval (procedure in `## Memory File Formats`).
+
+- Memory updates never replace the answer. Report them in one line at most.
+- **Session close.** When a plan is done, a large task is done, or the user signals closure, propose it in one line. Detect this from context; do not wait for a magic phrase. If accepted: run the 3 questions, update `.ai/active_context.md`, and reply with a handoff of its six sections. If the phase also finished, propose a partial archive in that same message. The user answers in chat and does not edit the memory files.
+- If the context was reset or summarized: save the current state to `active_context.md` and any pending decision to `decisions.md` first, then repeat section 1 and continue the task.
+
+### 4. Never
+
+- Invent, infer, propose, or increment a version number, including after a version close, an archive, or a large feature. When the user states one in chat, write it into `.ai/project_knowledge.md` and use it for the version close. Until then it stays frozen.
+- Write secrets (API keys, tokens, passwords) into any memory file. Reference them by name or location (e.g. "`API_KEY` — see `.env`").
+- {{IF_RECOVERABLE_DELETE}}Delete files permanently (`rm`, `rm -rf`, `del`, `Remove-Item -Force`, `unlink`, `shutil.rmtree`). Delete only when the user orders it. On Windows use `[Microsoft.VisualBasic.FileIO.FileSystem]::DeleteFile($path, 'OnlyErrorDialogs', 'SendToRecycleBin')`. Elsewhere, move the file to the OS Recycle Bin or `_trash/`.
+- Edit this file unless the user asks.
+
+### 5. Files
+
+Anything not covered above: ask "What does a future agent need this for?" and use this table.
+
+| File | Holds | Lifetime | Edited by |
+| --- | --- | --- | --- |
+| `AGENTS.md` | How the agent must behave | Until the human changes it | Human only |
+| `.ai/project_knowledge.md` | How the project is built: stack, structure, architecture | Until the architecture changes | {{AUTONOMY_RULE}} |
+| `.ai/active_context.md` | What is true now and what to do next (handoff note, not a history) | Current phase | AI |
+| `.ai/decisions.md` | Why it is this way; what must not be redone | Until superseded | AI |
+| `.ai/changelog.md` | What happened and when (append-only) | Forever | AI drafts, human approves |
+
+{{DEPRECATION_NOTE}}
+
+## Memory File Formats
+
+### `.ai/project_knowledge.md`
+
+- Line 1 is `> **Current Version:** vX.Y.Z`. The version lives only there.
+- `## Project Structure` is a `text` code block with box-drawing characters:
+  - Root line: project folder name + `/`.
+  - List every relevant directory. Skip `.git`, `node_modules`, `dist`, `build`, `vendor`, `.venv`, `__pycache__`, `target`, caches, and empty dirs.
+  - Max 3 levels deep.
+  - Under a directory, list a file only if it is an entry point, a key config, a canonical doc, a core module, a main script, or a source of truth. Do not list lockfiles, generated output, bulk assets, test files, or minor utilities. Collapse repeated files into one line (`*.png`).
+  - Every line has a trailing `#` comment of 12 words or fewer. Mark special dirs there (gitignored, generated, backup, trash, read-only).
+  - Shape to copy:
+
+```text
+project-root/
+├── src/                    # Core application source
+│   ├── components/         # UI components
+│   ├── services/           # Business logic and API
+│   │   └── api.ts          # API client and endpoints
+│   └── utils/              # Helpers and shared utilities
+├── tests/                  # Test suites
+├── docs/                   # Documentation
+├── package.json            # Dependencies and scripts
+└── README.md               # Project overview
+```
+
+- Tech Stack: bullets with version and justification, not prose.
+
+### `.ai/active_context.md`
+
+Handoff note, not a history. Anything not needed to continue belongs in `changelog.md` (what happened) or `decisions.md` (why).
+
+| Section | Limit |
+| --- | --- |
+| Current Objective | 1–3 sentences + max 5 bullets |
+| Current State | 1–3 sentences + max 5 bullets |
+| Current Phase Changes | max 10 bullets (file path + brief reason) |
+| Active Bugs & Technical Debt | max 8 entries |
+| Next Steps | max 7 numbered items, one line each |
+| Key Files in Play | max 12, one-line purpose each |
+
+- Header: `> **Last updated:** YYYY-MM-DD | **Last Bug ID:** ID-XX`.
+- Bug IDs are permanent and never reused. New bug: next ID = `Last Bug ID` + 1, then update the header.
+- Bug entry: `- ID-NN [OPEN|MITIGATED|RESOLVED|WONTFIX] description — file(s) — root cause if known`.
+- **Partial archive** when a section reaches its limit, the user moves to a different topic, module, or working folder than the Current Objective, a plan or phase finishes, or RESOLVED/WONTFIX bugs are still listed. Procedure in `.ai/changelog.md` below. The user approves in chat.
+
+### `.ai/decisions.md`
+
+**Order.** Same rule as the changelog: the newest entry is at the top.
+
+- Insert every new entry directly under the header, above all previous entries.
+- Never append a new decision at the bottom of the file.
+- The first `### D-` in the file is the newest. The last one is the oldest.
+- Next ID = the highest `D-NN` number in the file + 1. Do not derive the ID from the position in the file. IDs are permanent and never reused.
+- Never delete entries. Replaced and obsolete ones stay. `grep "^### D-"` lists them all.
+
+One entry format:
+
+```markdown
+### D-07 [ACTIVE] Short title
+- Topic: arch/proxy · Type: discard · Date: YYYY-MM-DD
+- What: one sentence.
+- Why: motivation and rejected alternatives with reasons.
+- Where: affected files or paths.
+```
+
+- Optional extra lines: `- Learned: ...` and `- Reviewed: YYYY-MM-DD`.
+- One-line form for quick captures: `### D-08 [ACTIVE] Short title` followed by a single line `- Topic: ... · Type: ... · Date: YYYY-MM-DD · what and why in one sentence.`
+- Topic = closed prefix + free keyword. Prefixes: `arch`, `stack`, `ui`, `data`, `tooling`, `convention`, `workflow`, `env`.
+- Type: `decision` | `discard` | `discovery` | `convention` | `preference`.
+- State: `[ACTIVE]` | `[REPLACED->D-NN]` | `[OBSOLETE]`.
+
+### `.ai/changelog.md`
+
+- Append-only: never modify an existing entry. Insert new blocks at the top. The only exception is renaming the `[Unversioned]` heading during a version close.
+- The first version heading in the file is the newest. Never append a new block at the bottom.
+- Group under `## [vX.Y.Z] - YYYY-MM-DD` and `### Update YYYY-MM-DD`. Never merge the dates of different sessions.
+- Summarize phases; do not log tool calls. Resolved bugs: `[Resolves ID-XX]`. Discards belong in `decisions.md`.
+- `## [Unversioned] — in progress` stays at the top of the file, above every closed version. Partial archives stack inside that one block. They are not new files.
+
+**Partial archive.** Propose it in one line and wait for a yes in the chat. Do not archive on your own. Propose it when any of these is true:
+
+- A section of `active_context.md` has reached its limit.
+- The user moved to a different topic, module, or working folder than the Current Objective.
+- A plan or phase finished.
+- `RESOLVED` or `WONTFIX` bugs are still listed in Active Bugs.
+
+After the user accepts:
+
+1. Write a summary of the finished phase under `## [Unversioned] — in progress`, as a new `### Update YYYY-MM-DD` placed at the top of that block (above older updates, below the heading). Include one `[Resolves ID-XX]` line for each RESOLVED or WONTFIX bug being removed.
+2. Check that durable decisions are already in `decisions.md`. If one is missing, add it there before finishing.
+3. Rewrite `active_context.md` with all six sections: the new Current Objective, Current State, an empty Current Phase Changes (`—`), only the unresolved bugs, Next Steps, and Key Files. Never leave the file empty. Keep `Last Bug ID`.
+4. Do not invent a version number and do not rename the `[Unversioned]` block.
+5. Confirm in one line.
+
+**Version close.** This gathers every partial archive of the open block into one version. The user does it from the chat. They do not open the file to type the version.
+
+When the user says the version is done:
+
+1. If they did not give the version number, ask once and wait. Never invent, infer, or increment it.
+2. If `## [Unversioned] — in progress` has no `### Update` yet, write one summary of the current phase into it first.
+3. Rename that heading to `## [vX.Y.Z] - YYYY-MM-DD`. Keep every `### Update` inside it, in the same order. Do not rewrite them.
+4. Put a fresh, empty `## [Unversioned] — in progress` above the version you just closed.
+5. Write the same number into `Current Version` in `project_knowledge.md`.
+6. Confirm in one line: the version, and how many partial updates it gathered.
+
+## Anti-Error Rules & Development Standards
+
+{{PROJECT_RULES}}
+````
+
+## B.2 `.ai/project_knowledge.md`
+
+````markdown
+> **Current Version:** {{VERSION}} (human-assigned; the AI writes it only when the user states it)
+
+## Design & Product Philosophy
+
+{{PHILOSOPHY}}
+
+## Tech Stack
+
+{{TECH_STACK}}
+
+## Project Structure
+
+```text
+{{PROJECT_TREE}}
+```
+
+## Architecture
+
+| Component | Single Responsibility | Critical Restriction |
+| --- | --- | --- |
+{{ARCHITECTURE_ROWS}}
+
+## Design Decisions Pointer
+
+> See .ai/decisions.md for all design decisions, technical discards, discoveries, and conventions with lifecycle tracking.
+
+## Data Flow
+
+{{DATA_FLOW}}
+````
+
+## B.3 `.ai/active_context.md`
+
+````markdown
+> **Last updated:** {{DATE}} | **Last Bug ID:** ID-00
+
+## Current Objective
+
+{{OBJECTIVE}}
+
+## Current State
+
+{{STATE}}
+
+## Current Phase Changes
+
+—
+
+## Active Bugs & Technical Debt
+
+—
+
+## Next Steps
+
+{{NEXT_STEPS}}
+
+## Key Files in Play
+
+{{KEY_FILES}}
+````
+
+## B.4 `.ai/decisions.md`
+
+````markdown
+# Decisions
+
+> Quick reference: `grep "^### D-"` lists all decisions with their state. Format and rules: `AGENTS.md` → `## Memory File Formats`.
+````
+
+## B.5 `.ai/changelog.md`
+
+````markdown
+# Changelog
+
+## [Unversioned] — in progress
+
+## [{{VERSION}}] - {{DATE}}
+
+{{BASELINE_NOTE}}
+````
+
+## B.6 Client rules stub (category 10)
+
+````markdown
+# Memory system
+Before anything else, read `AGENTS.md` at the project root and follow its `## Memory Protocol`.
+It defines how to read and update the memory files in `.ai/`.
+````
